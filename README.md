@@ -16,7 +16,6 @@
 [![Stargazers][stars-shield]][stars-url]
 [![Issues][issues-shield]][issues-url]
 [![MIT License][license-shield]][license-url]
-[![Visitors][visitor-shield]][visitor-url]
 
 # Leaf Music Player
 Music Player for Android.
