@@ -75,6 +75,7 @@ dependencies {
     implementation(libs.androidx.compose.material3)
     implementation(libs.accompanist.systemuicontroller)
     implementation(libs.androidx.legacy.support.v4)
+    implementation(libs.io.coil)
 
     implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation(libs.androidx.lifecycle.runtime.compose)

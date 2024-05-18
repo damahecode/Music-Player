@@ -23,8 +23,10 @@ lifecycle-viewmodel-compose = "2.7.0"
 compose-material3 = "1.1.2"
 compose-ui-tooling-preview = "1.6.0"
 legacy-support-v4 = "1.0.0"
+io-coil = "2.6.0"
 
 [libraries]
+io-coil = { group = "io.coil-kt", name = "coil-compose", version.ref = "io-coil" }
 androidx-legacy-support-v4 = { group = "androidx.legacy", name = "legacy-support-v4", version.ref = "legacy-support-v4" }
 accompanist-systemuicontroller = { group = "com.google.accompanist", name = "accompanist-systemuicontroller", version.ref = "accompanist-systemuicontroller" }
 androidx-activity-compose = { group = "androidx.activity", name = "activity-compose", version.ref = "activity-compose" }

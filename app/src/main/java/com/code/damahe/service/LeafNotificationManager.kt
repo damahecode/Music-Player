@@ -62,7 +62,7 @@ class LeafNotificationManager(private val service: PlayerService) {
 
             val music = service.getMediaManager()?.getCurrentMusic()
             val mediaSession = service.getMediaSession()
-            val imgArt = getImgArt(music?.path)
+            val imgArt = getImgArt(service, music?.trackUri)
             val isPlaying = service.getMediaManager()?.isPlaying() ?: false
 
             val openPlayerIntent = Intent(context, MainActivity::class.java)
@@ -122,7 +122,7 @@ class LeafNotificationManager(private val service: PlayerService) {
             val mediaSession = service.getMediaSession()
             val getDuration = service.getMediaManager()?.getDuration() ?: 0
             val playbackSpeed = if (isPlaying) 1F else 0F
-            val imgArt = getImgArt(music?.path)
+            val imgArt = getImgArt(service, music?.trackUri)
 
             if (!update) {
                 mediaSession?.setCallback(service.getMediaManager()?.mediaSessionCallback)

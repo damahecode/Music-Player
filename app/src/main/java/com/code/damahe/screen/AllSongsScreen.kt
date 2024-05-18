@@ -1,5 +1,6 @@
 package com.code.damahe.screen
 
+import android.content.Context
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -7,12 +8,12 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -20,46 +21,69 @@ import androidx.compose.material.icons.rounded.Face
 import androidx.compose.material.icons.rounded.KeyboardArrowLeft
 import androidx.compose.material.icons.rounded.KeyboardArrowRight
 import androidx.compose.material.icons.rounded.PlayArrow
+import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import coil.compose.rememberAsyncImagePainter
+import coil.request.ImageRequest
 import com.code.damahe.app.MusicEvent
 import com.code.damahe.app.PlayerState
 import com.code.damahe.res.R
 import com.code.damahe.modal.Music
 import com.code.damahe.modal.MusicControllerUiState
-import com.code.damahe.modal.getImage
-import com.code.damahe.modal.getImgArt
 import com.code.damahe.util.Util.formatDurationTimeStyle
 import com.code.damahe.viewmodel.PlayerViewModel
 
 @Composable
-fun AllSongsList(getAllAudio: List<Music>, click: (Int)-> Unit) {
-    LazyColumn(
-        modifier = Modifier
-            .fillMaxSize()
-            .systemBarsPadding()
-    ) {
-        items(count = getAllAudio.size) {
-            MusicItem(getAllAudio[it]) { click(it) }
+fun AllSongsList(modifier: Modifier, viewModel: PlayerViewModel, click: (Int, List<Music>)-> Unit) {
+    val context = LocalContext.current
+    val getAllAudio by viewModel.getAllAudio.collectAsState()
+
+    if (getAllAudio.isEmpty()) {
+        Column(
+            modifier = modifier,
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Button(onClick = { viewModel.fetchAllAudio(context) }) {
+                Text(text = stringResource(id = R.string.app_name))
+            }
+        }
+    } else {
+        LazyColumn(
+            modifier = modifier,
+        ) {
+            itemsIndexed(getAllAudio) { index, music ->
+                MusicItem(context, music) { click(index, getAllAudio) }
+            }
         }
     }
 }
 
 @Composable
-fun MusicItem(music: Music, click: ()-> Unit) {
+fun MusicItem(context: Context, music: Music, click: ()-> Unit) {
+
+    val imagePainter = rememberAsyncImagePainter(
+        model = ImageRequest.Builder(context)
+            .error(R.drawable.music_note_24)
+            .data(music.artUri)
+            .build()
+    )
 
     Surface(
         modifier = Modifier
@@ -72,24 +96,13 @@ fun MusicItem(music: Music, click: ()-> Unit) {
             modifier = Modifier.padding(10.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            val imgArt = getImgArt(music.path)
-            if (getImage(imgArt) != null) {
-                Image(
-                    modifier = Modifier
-                        .size(40.dp)
-                        .padding(2.dp),
-                    bitmap = getImage(imgArt)!!.asImageBitmap(),
-                    contentDescription = "Song cover"
-                )
-            } else {
-                Image(
-                    modifier = Modifier
-                        .size(40.dp)
-                        .padding(2.dp),
-                    painter = painterResource(id = R.drawable.music_note_24),
-                    contentDescription = "Song cover"
-                )
-            }
+            Image(
+                modifier = Modifier
+                    .size(40.dp)
+                    .padding(2.dp),
+                painter = imagePainter,
+                contentDescription = "Song cover"
+            )
             Column(
                 modifier = Modifier
                     .padding(horizontal = 4.dp)
@@ -122,6 +135,13 @@ fun PlayerScreenContent(
     playPauseIcon: ImageVector,
     onEvent: (MusicEvent) -> Unit
 ) {
+    val context = LocalContext.current
+    val imagePainter = rememberAsyncImagePainter(
+        model = ImageRequest.Builder(context)
+            .error(R.drawable.music_note_24)
+            .data(musicUiState.currentSong?.artUri)
+            .build()
+    )
 
     Box(
         modifier = Modifier.fillMaxWidth()
@@ -142,28 +162,15 @@ fun PlayerScreenContent(
                             .aspectRatio(1f)
 
                     ) {
-                        val imgArt = getImgArt(musicUiState.currentSong?.path)
-                        if (getImage(imgArt) != null) {
-                            Image(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .aspectRatio(1.0f)
-                                    .align(Alignment.Center)
-                                    .clip(RoundedCornerShape(5.dp)),
-                                bitmap = getImage(imgArt)!!.asImageBitmap(),
-                                contentDescription = "Song cover"
-                            )
-                        } else {
-                            Image(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .aspectRatio(1.0f)
-                                    .align(Alignment.Center)
-                                    .clip(RoundedCornerShape(5.dp)),
-                                painter = painterResource(id = R.drawable.music_note_24),
-                                contentDescription = "Song cover"
-                            )
-                        }
+                        Image(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .aspectRatio(1.0f)
+                                .align(Alignment.Center)
+                                .clip(RoundedCornerShape(5.dp)),
+                            painter = imagePainter,
+                            contentDescription = "Song cover"
+                        )
                     }
 
                     Text(

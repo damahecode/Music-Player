@@ -2,6 +2,7 @@ package com.code.damahe.modal
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.content.ContentUris
 import android.content.Context
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
@@ -11,7 +12,6 @@ import android.media.MediaMetadataRetriever
 import android.net.Uri
 import android.os.Build
 import android.provider.MediaStore
-import java.io.File
 
 data class Music(
     val id: String,
@@ -20,7 +20,8 @@ data class Music(
     val artist: String,
     val path: String,
     val duration: Long,
-    val artUri: Uri
+    val artUri: Uri,
+    val trackUri: Uri
 )
 
 @SuppressLint("Recycle", "Range")
@@ -31,7 +32,7 @@ fun getAudioList(context: Context): ArrayList<Music> {
     if (context.checkSelfPermission(id) != PackageManager.PERMISSION_GRANTED)
         return tempList
 
-    val sortingList = arrayOf(MediaStore.Audio.Media.DATE_ADDED + " DESC", MediaStore.Audio.Media.TITLE,
+    val sortingList = arrayOf(MediaStore.Audio.Media.TITLE, MediaStore.Audio.Media.DATE_ADDED + " DESC",
         MediaStore.Audio.Media.SIZE + " DESC")
     val sortOrder = 0
     val selection = MediaStore.Audio.Media.IS_MUSIC +  " != 0"
@@ -49,13 +50,15 @@ fun getAudioList(context: Context): ArrayList<Music> {
                 val artistC = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.ARTIST)) ?: "Unknown"
                 val pathC = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DATA))
                 val durationC = cursor.getLong(cursor.getColumnIndex(MediaStore.Audio.Media.DURATION))
-                val albumIdC = cursor.getLong(cursor.getColumnIndex(MediaStore.Audio.Media.ALBUM_ID)).toString()
+                val albumIdC = cursor.getLong(cursor.getColumnIndex(MediaStore.Audio.Media.ALBUM_ID))
                 val uriAlbumArt = Uri.parse("content://media/external/audio/albumart")
-                val artUri = Uri.withAppendedPath(uriAlbumArt, albumIdC)
-                val music = Music(id = idC, title = titleC, album = albumC, artist = artistC, path = pathC, duration = durationC, artUri = artUri)
-                val file = File(music.path)
-                if(file.exists())
-                    tempList.add(music)
+                val artUri = ContentUris.withAppendedId(uriAlbumArt, albumIdC)
+                val trackUri = ContentUris.withAppendedId(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, idC.toLong())
+                val music = Music(id = idC, title = titleC, album = albumC, artist = artistC, path = pathC, duration = durationC, artUri = artUri, trackUri = trackUri)
+//                val file = File(music.path)
+//                if(file.exists())
+//                    tempList.add(music)
+                tempList.add(music)
             } while (cursor.moveToNext())
         }
         cursor.close()
@@ -63,9 +66,9 @@ fun getAudioList(context: Context): ArrayList<Music> {
     return tempList
 }
 
-fun getImgArt(path: String?): ByteArray? {
+fun getImgArt(context: Context, trackUri: Uri?): ByteArray? {
     val retriever = MediaMetadataRetriever()
-    retriever.setDataSource(path)
+    retriever.setDataSource(context, trackUri)
     return retriever.embeddedPicture
 }
 

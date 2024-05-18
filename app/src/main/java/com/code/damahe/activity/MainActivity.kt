@@ -9,7 +9,6 @@ import android.os.Bundle
 import android.provider.Settings
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.activity.viewModels
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
@@ -22,13 +21,9 @@ import com.code.damahe.material.viewmodel.ThemeUiState.Loading
 import com.code.damahe.material.viewmodel.ThemeUiState.Success
 import com.code.damahe.screen.MainScreen
 import com.code.damahe.util.Permissions
-import com.code.damahe.viewmodel.PlayerViewModel
-import dagger.hilt.android.AndroidEntryPoint
 
-@AndroidEntryPoint
 class MainActivity : Activity() {
 
-    private val playerViewModel: PlayerViewModel by viewModels()
     private var ongoingRequest: AlertDialog? = null
     private var isPermissionShowing = false
 
@@ -50,11 +45,9 @@ class MainActivity : Activity() {
         // including IME animations
         WindowCompat.setDecorFitsSystemWindows(window, false)
 
-        playerViewModel.bindService()
-
         setContent {
             MainContent(themeUiState = themeUiState) {
-                MainScreen(playerViewModel)
+                MainScreen()
             }
         }
     }
@@ -63,16 +56,13 @@ class MainActivity : Activity() {
         super.onResume()
         if (!Permissions.checkRunningConditions(this, Permissions.getAllPermission())) {
             requestRequiredPermissions()
-        } else
-            playerViewModel.fetchAllAudio(this)
+        }
     }
 
     override fun onDestroy() {
         super.onDestroy()
         isPermissionShowing = false
         ongoingRequest?.takeIf { it.isShowing }?.dismiss()
-
-        playerViewModel.unBindService()
     }
 
     private val requestPermissionLauncher = registerForActivityResult(
@@ -80,9 +70,6 @@ class MainActivity : Activity() {
     ) { isGranted ->
         isPermissionShowing = false
         requestRequiredPermissions(!isGranted)
-        if (isGranted) {
-            playerViewModel.fetchAllAudio(this)
-        }
     }
 
     private fun requestRequiredPermissions(deniedAfterRequest: Boolean = false) {

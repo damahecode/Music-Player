@@ -16,13 +16,9 @@ import com.code.damahe.modal.getAudioList
 import com.code.damahe.service.PlayerService
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import java.lang.ref.WeakReference
 import javax.inject.Inject
@@ -65,7 +61,8 @@ class PlayerViewModel @Inject constructor(
     }
 
     fun setMusic(index: Int, list: List<Music> = emptyList()) {
-        playerRepo.getMediaManager()?.setMusic(index, list)
+        if (getService() != null)
+            playerRepo.getMediaManager()?.setMusic(index, list)
     }
 
     fun updateMusicState() {

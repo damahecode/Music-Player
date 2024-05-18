@@ -1,7 +1,6 @@
 package com.code.damahe.service
 
 import android.app.Service.STOP_FOREGROUND_REMOVE
-import android.content.ContentUris
 import android.content.Intent
 import android.media.MediaPlayer
 import android.os.PowerManager
@@ -33,12 +32,7 @@ class MediaManager(private val service: PlayerService) : MediaPlayer.OnPreparedL
         }
 
         try {
-            val trackUri = ContentUris.withAppendedId(
-                android.provider.MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
-                getCurrentMusic().id.toLong()
-            )
-
-            mediaPlayer?.setDataSource(service, trackUri)
+            mediaPlayer?.setDataSource(service, getCurrentMusic().trackUri)
             mediaPlayer?.prepareAsync()
             setPlayerState()
         } catch (e: IllegalStateException) {
@@ -135,6 +129,7 @@ class MediaManager(private val service: PlayerService) : MediaPlayer.OnPreparedL
         service.stopForeground(STOP_FOREGROUND_REMOVE)
         mediaPlayer?.release()
         mediaPlayer = null
+        service.stopSelf()
     }
 
     override fun onCompletion(mp: MediaPlayer) {

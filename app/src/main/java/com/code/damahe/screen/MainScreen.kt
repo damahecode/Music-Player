@@ -25,7 +25,6 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -46,10 +45,9 @@ import com.code.damahe.viewmodel.PlayerViewModel
     ExperimentalMaterial3Api::class
 )
 @Composable
-fun MainScreen(viewModel: PlayerViewModel) {
+fun MainScreen(viewModel: PlayerViewModel = hiltViewModel()) {
 
     val mBound = viewModel.mBound.collectAsState()
-    val getAllAudio by viewModel.getAllAudio.collectAsState()
 
     if (mBound.value) {
         viewModel.getService()?.setListener(object : PlayerListener {
@@ -115,7 +113,14 @@ fun MainScreen(viewModel: PlayerViewModel) {
                             ),
                         ),
                 ) {
-                    AllSongsList(getAllAudio) { viewModel.setMusic(it, getAllAudio) }
+                    AllSongsList(modifier = Modifier
+                        .fillMaxSize()
+                        .systemBarsPadding(),
+                        viewModel
+                    ) { index, list ->
+                        viewModel.bindService()
+                        viewModel.setMusic(index, list)
+                    }
 
                     // Sheet content
                     if (openBottomSheet.value) {
