@@ -7,6 +7,7 @@ object Config {
     const val ACTION_PREV = "com.code.damahe.leaf.music.ACTION_PREV"
     const val ACTION_PLAY_PAUSE = "com.code.damahe.leaf.music.ACTION_PLAY_PAUSE"
     const val ACTION_NEXT = "com.code.damahe.leaf.music.ACTION_NEXT"
+    const val ACTION_STOP = "com.code.damahe.leaf.music.ACTION_STOP"
     const val REQUEST_CODE = 108
 }
 

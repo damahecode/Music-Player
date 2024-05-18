@@ -81,6 +81,7 @@ class PlayerService : Service() {
                     Config.ACTION_PREV -> mediaManager?.prev()
                     Config.ACTION_PLAY_PAUSE -> mediaManager?.playPause()
                     Config.ACTION_NEXT -> mediaManager?.next()
+                    Config.ACTION_STOP -> mediaManager?.release()
                 }
             }
         }
@@ -93,6 +94,7 @@ class PlayerService : Service() {
         intentFilter.addAction(Config.ACTION_PREV)
         intentFilter.addAction(Config.ACTION_PLAY_PAUSE)
         intentFilter.addAction(Config.ACTION_NEXT)
+        intentFilter.addAction(Config.ACTION_STOP)
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             registerReceiver(notificationReceiver, intentFilter, Context.RECEIVER_NOT_EXPORTED)

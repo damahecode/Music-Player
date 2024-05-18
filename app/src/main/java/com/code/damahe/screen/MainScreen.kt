@@ -118,7 +118,6 @@ fun MainScreen(viewModel: PlayerViewModel = hiltViewModel()) {
                         .systemBarsPadding(),
                         viewModel
                     ) { index, list ->
-                        viewModel.bindService()
                         viewModel.setMusic(index, list)
                     }
 

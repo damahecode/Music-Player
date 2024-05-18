@@ -15,22 +15,20 @@ import com.code.damahe.modal.MusicControllerUiState
 import com.code.damahe.modal.getAudioList
 import com.code.damahe.service.PlayerService
 import dagger.hilt.android.lifecycle.HiltViewModel
-import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import java.lang.ref.WeakReference
 import javax.inject.Inject
 import kotlin.time.Duration.Companion.seconds
 
 @HiltViewModel
 class PlayerViewModel @Inject constructor(
-    @ApplicationContext context: Context,
+    //@ApplicationContext context: Context,
     private val playerRepo: PlayerRepository
 ): ViewModel() {
 
-    private val context = WeakReference(context)
+//    private val context = WeakReference(context)
     private var runningPosition = false
 
     val mBound = playerRepo.playerBuilder.mBound
@@ -50,7 +48,7 @@ class PlayerViewModel @Inject constructor(
         }
     }
 
-    fun bindService() {
+    private fun bindService() {
         if (playerRepo.getService() == null)
             playerRepo.playerBuilder.bindService()
     }
@@ -61,8 +59,13 @@ class PlayerViewModel @Inject constructor(
     }
 
     fun setMusic(index: Int, list: List<Music> = emptyList()) {
-        if (getService() != null)
-            playerRepo.getMediaManager()?.setMusic(index, list)
+        viewModelScope.launch {
+            bindService()
+            if (getService() == null)
+                delay(1.seconds)
+            if (getService() != null)
+                playerRepo.getMediaManager()?.setMusic(index, list)
+        }
     }
 
     fun updateMusicState() {

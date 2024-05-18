@@ -98,6 +98,7 @@ class LeafNotificationManager(private val service: PlayerService) {
                     .addAction(notificationAction(Config.ACTION_PREV))
                     .addAction(notificationAction(Config.ACTION_PLAY_PAUSE))
                     .addAction(notificationAction(Config.ACTION_NEXT))
+                    .addAction(notificationAction(Config.ACTION_STOP))
 
                 getPlayBackState(music)
                 service.startForeground(Config.NOTIFICATION_ID, notificationBuilder?.build())
@@ -136,7 +137,7 @@ class LeafNotificationManager(private val service: PlayerService) {
 
             val playbackState = PlaybackStateCompat.Builder().setState(
                 if (isPlaying) PlaybackStateCompat.STATE_PLAYING else PlaybackStateCompat.STATE_PAUSED, getCurrentPosition, playbackSpeed)
-                .setActions(PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS or PlaybackStateCompat.ACTION_PLAY_PAUSE or PlaybackStateCompat.ACTION_SKIP_TO_NEXT or PlaybackStateCompat.ACTION_SEEK_TO)
+                .setActions(PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS or PlaybackStateCompat.ACTION_PLAY_PAUSE or PlaybackStateCompat.ACTION_SKIP_TO_NEXT or PlaybackStateCompat.ACTION_STOP or PlaybackStateCompat.ACTION_SEEK_TO)
                 .build()
 
             mediaSession?.setPlaybackState(playbackState)
@@ -155,6 +156,7 @@ class LeafNotificationManager(private val service: PlayerService) {
             Config.ACTION_PREV -> android.R.drawable.ic_media_previous
             Config.ACTION_PLAY_PAUSE -> if (service.getMediaManager()!!.isPlaying()) android.R.drawable.ic_media_pause else android.R.drawable.ic_media_play
             Config.ACTION_NEXT -> android.R.drawable.ic_media_next
+            Config.ACTION_STOP -> android.R.drawable.ic_menu_close_clear_cancel
             else -> android.R.drawable.ic_media_pause
         }
 
