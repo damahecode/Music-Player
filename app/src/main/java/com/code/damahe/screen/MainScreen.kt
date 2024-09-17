@@ -11,7 +11,7 @@ import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.rounded.Face
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
@@ -94,11 +94,14 @@ fun MainScreen(viewModel: PlayerViewModel = hiltViewModel()) {
                     )
                 },
                 floatingActionButton = {
-                    FloatingActionButton(
-                        modifier = Modifier.systemBarsPadding(),
-                        onClick = { openBottomSheet.value = true },
-                    ) {
-                        Icon(Icons.Filled.PlayArrow, "Localized description")
+                    val musicUiState = viewModel.musicControllerUiState
+                    if (musicUiState.playerState  != null) {
+                        FloatingActionButton(
+                            modifier = Modifier.systemBarsPadding(),
+                            onClick = { openBottomSheet.value = true },
+                        ) {
+                            Icon(Icons.Rounded.Face, "Localized description")
+                        }
                     }
                 }
             ) { padding ->
