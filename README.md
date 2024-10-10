@@ -17,7 +17,7 @@
 [![Issues][issues-shield]][issues-url]
 [![MIT License][license-shield]][license-url]
 
-# Leaf Music Player
+# Music Player
 Music Player for Android.
 
 # ⚠ Project is under development

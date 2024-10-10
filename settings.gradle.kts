@@ -14,7 +14,7 @@ dependencyResolutionManagement {
         maven ("https://jitpack.io")
     }
 }
-rootProject.name = "Leaf Music Player"
+rootProject.name = "Music Player"
 include ("app")
 include(":core:resource")
 include(":material-theme")
